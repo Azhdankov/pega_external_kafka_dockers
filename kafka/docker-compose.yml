@@ -1,0 +1,47 @@
+version: '3.9'
+volumes:
+  volume1:
+services:
+   kafka1:
+     image: 'bitnami/kafka:latest'
+     ports:
+      - "9092:9092"
+      - "9093:9093"
+     environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_NODE_ID=1
+      # - KAFKA_KRAFT_CLUSTER_ID=
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=SASL_PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=SASL_PLAINTEXT://:9092
+      - KAFKA_CFG_BROKER_ID=1
+      - KAFKA_CFG_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=SASL_PLAINTEXT
+      - KAFKA_CLIENT_USERS=kafkauser
+      - KAFKA_CLIENT_PASSWORDS=kafkapassword
+      - KAFKA_INTER_BROKER_USER=ibadmin
+      - KAFKA_INTER_BROKER_PASSWORD=password
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka1:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_HEAP_OPTS=-Xmx1048m -Xms1048m
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=
+      - KAFKA_TLS_CLIENT_AUTH=none
+     volumes:
+      - './:/bitnami/tmp/'
+   kafka_ui:
+     image: provectuslabs/kafka-ui:latest
+     ports:
+       - "8080:8080"
+     environment:
+       - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka1:9092
+       - KAFKA_CLUSTERS_0_NAME=kraft
+       - SERVER_PORT=8080
+       - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SASL_PLAINTEXT
+       - KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM=PLAIN
+       - KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=kafkauser password=kafkapassword;
+     depends_on:
+      - kafka1
