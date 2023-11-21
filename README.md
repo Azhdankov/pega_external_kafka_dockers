@@ -51,7 +51,7 @@ You may use current project for start up Pega PE without stream node type and ex
 * Firstly, you have to prepare pega for next using. You may use [this](https://github.com/kannan-raveendran-nair/pega-pe-docker/tree/master) project to install pega with docker. **However before build pega image you have to [change](https://docs-previous.pega.com/decision-management/87/configuring-external-kafka-stream-service) prconfig.xml from project.** Change prconfig.xml and put your gateway_ip from previous step to the line below
 
 ```xml
-        <env name="services/stream/broker/url" value="{gateway_ip}" />
+        <env name="services/stream/broker/url" value="{gateway_ip}:9092" />
 ```
 
 * The following setting allows you to run the application with the required node types: open the docker-compose file with pega services and put next thr line in the environment for pega pe service:
